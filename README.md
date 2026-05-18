@@ -21,20 +21,48 @@ IA_TP5_TITANIC_RNA/
 └── README.md
 ```
 
-### ia_titanic.py
+### ia_titanic.ipynb
 
-Limpieza Automática: El script elimina lo que no aporta patrones (Name, Ticket, etc.), rellena los vacíos con estadísticas seguras (medianas) y escala los datos numéricos para que características grandes como Fare (tarifa) no eclipsen a Age.
+### Celda 1: Configuración del Entorno y Librerías
+Se importaron las librerías base para la manipulación de datos (Pandas, NumPy), preparación y escalado (Scikit-Learn), balanceo de clases (Imbalanced-Learn) y el motor de aprendizaje profundo (TensorFlow/Keras).
+Objetivo: Preparar el entorno de ejecución y configurar filtros para silenciar advertencias del sistema, garantizando una consola limpia.
 
-SMOTE Activo: Verás en la consola cómo las clases se igualan perfectamente antes de la separación de los conjuntos.
+### Celda 2: Carga, Limpieza y Preprocesamiento de Datos
+Se eliminaron columnas irrelevantes para el modelado (PassengerId, Name, Ticket, Cabin).
+Se imputaron los valores faltantes usando la mediana para variables numéricas (Age, Fare) y la moda para categóricas (Embarked).Se convirtieron las variables de texto a variables numéricas binarias mediante codificación One-Hot Encoding (pd.get_dummies).
+Se aplicó la técnica SMOTE (Synthetic Minority Over-sampling Technique) para equilibrar la proporción de pasajeros supervivientes y fallecidos.
+Objetivo: Transformar los datos brutos en una matriz numérica limpia, normalizada y balanceada apta para la red neuronal.
 
-El checkpoint: El entrenamiento generará un archivo .keras. Ese es el "intervalo de iteración" donde guardamos el estado exacto del modelo cada vez que el error de validación baja.
+### Celda 3: División del Conjunto de Datos
+Se realizó una partición estratificada de los datos en tres conjuntos independientes: Entrenamiento (70%), Validación (15%) y Prueba (15%) utilizando semillas de aleatoriedad fija (random_state=42).
+Objetivo: Aislar los datos con los que la red aprenderá (Train), con los que se calibrará en tiempo real (Val) y con los que se medirá su éxito final en un entorno no visto (Test).
 
-### Variacion del modelo 2 y 3 con respecto al modelo 1
-Variación en Capas y Neuronas: Pasamos de un modelo básico (1 capa / 16 neuronas) a uno intermedio (2 capas / 32 y 16 neuronas) y finalmente a uno complejo (3 capas / 64, 32 y 16 neuronas).
+### Celda 4: Modelo 1 - Arquitectura Simple
+Se diseñó una red neuronal feed-forward elemental con una única capa oculta de 16 neuronas (ReLU) y una capa de salida binaria (Sigmoid). 
+Se entrenó con una tasa de aprendizaje alta ($0.01$) y se incorporó Early Stopping para detener el proceso si el error de validación dejaba de mejorar.
+Objetivo: Establecer una línea de base (baseline) para medir el rendimiento mínimo de la red neuronal en la clasificación.
 
-Tasa de Aprendizaje: En el Modelo 1 usamos 0.01 (ajustes más rápidos pero bruscos). En el 2 y el 3 usamos 0.001 para que los pesos se ajusten con mayor delicadeza en el espacio matemático.
+### Celda 5: Modelo 2 - Arquitectura Intermedia
+Se incrementó la complejidad agregando una segunda capa oculta (configuración de 32 y 16 neuronas) y se redujo la tasa de aprendizaje a una diez veces menor ($0.001$) para un ajuste de pesos más fino y preciso.
+Objetivo: Permitir que la red capture relaciones y patrones más complejos entre las variables del Titanic, mejorando la métrica general de F1-Score.
 
-Inclusión de Dropout (Modelo 3): Es una técnica de posprocesamiento/procesamiento avanzada. Apaga aleatoriamente un porcentaje de neuronas en cada iteración de entrenamiento, obligando a la red a no depender de una sola combinación de datos y destruyendo cualquier intento de memorización.
+### Celda 6: Modelo 3 - Arquitectura Compleja con Regularización
+Se estructuró una red más profunda (64, 32 y 16 neuronas) combinada con capas de Dropout (0.3 y 0.2). El Dropout apaga neuronas al azar durante el entrenamiento.
+Objetivo: Forzar a la red a no depender de conexiones específicas, actuando como una técnica de regularización para combatir activamente el sobreajuste (overfitting).
+
+### Celda 7: Inferencia en Lote (Puesta en Producción)
+Se extrajo el modelo entrenado y el escalador vivos en la memoria del cuaderno y se inyectaron los perfiles de dos pasajeros completamente ficticios (uno de perfil de alta probabilidad de supervivencia y otro de baja). Los datos se estructuraron en un DataFrame y se transformaron bajo el mismo pipeline.
+Objetivo: Demostrar la viabilidad del modelo en un entorno de producción real (Inferencia), obteniendo predicciones y porcentajes de probabilidad en tiempo real.
+
+### Archivos .keras
+
+Son archivos binarios compactos que almacenan tres cosas:
+
+La arquitectura: El mapa estructural de la red (cuántas capas y cuántas neuronas tiene ese modelo específico).
+
+Los pesos y sesgos: Los valores numéricos exactos de las conexiones que la red estuvo calculando y puliendo durante el entrenamiento.
+
+El estado del optimizador: La configuración exacta en la que se quedó el algoritmo por si en el futuro quisieras retomar el entrenamiento desde donde paró.
 
 ---
 
