@@ -13,7 +13,7 @@ IA_TP5_TITANIC_RNA/
 ├── data/
 │   └── titanic.csv            # Dataset original
 ├── src/
-│   ├── ia_titanic.py    
+│   ├── ia_titanic.ipynb
 │   └── mejor_modelo_1.keras
 |   └── mejor_modelo_2.keras
 |   └── mejor_modelo_3.keras
@@ -97,9 +97,9 @@ python -m venv .venv
 
 ### 3. Instalar dependencias
 
-```bash
-pip install pandas numpy scikit-learn imbalanced-learn
-```
+%pip install scikit-learn imbalanced-learn pandas numpy
+
+%pip install tensorflow
 
 ---
 
